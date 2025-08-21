@@ -1,0 +1,634 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>湘绣数字化传承平台</title>
+  
+  <!-- 引入所需库 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alibaba+PuHuiTi:wght@300;400;500&amp;display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --indigo: #2E5A88;       /* 靛青 */
+      --gold: #D4AF37;         /* 香槟金 */
+      --red: #B22222;          /* 湖湘红 */
+      --silk: #F8F4E9;         /* 素绢白 */
+      --paper: #FAF6EB;        /* 浅绢色 */
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background-color: #FAF6EB;
+      color: #333;
+      font-family: 'Alibaba PuHuiTi', sans-serif;
+      width: 1440px;
+      margin: 0 auto;
+      overflow-x: hidden;
+    }
+    
+    /* 字体指定 */
+    h1, h2, h3, header {
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 700;
+    }
+    
+    .quote-font {
+      font-family: 'ZCOOL XiaoWei', serif;
+    }
+    
+    /* 主容器 */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* 卡片样式 */
+    .card {
+      background-color: var(--paper);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(206, 118, 44, 0.1);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--indigo), var(--gold));
+    }
+    
+    /* 时间轴样式 */
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+    
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 20px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--gold), var(--indigo));
+    }
+    
+    .timeline-node {
+      position: relative;
+      margin-bottom: 40px;
+    }
+    
+    .timeline-node::before {
+      content: "";
+      position: absolute;
+      left: -35px;
+      top: 8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: var(--indigo);
+      border: 3px solid var(--gold);
+      transform: translateX(-50%);
+    }
+    
+    /* 瀑布流布局 */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    
+    /* 悬浮导航 */
+    .floating-nav {
+      position: fixed;
+      top: 50%;
+      right: 40px;
+      transform: translateY(-50%);
+      z-index: 100;
+    }
+    
+    /* 滚动效果 */
+    section {
+      scroll-margin-top: 80px;
+    }
+    
+    /* 技术针法区 */
+    .tech-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    
+    /* 模态框 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      width: 80%;
+      max-width: 900px;
+      background: var(--silk);
+      border-radius: 8px;
+      padding: 30px;
+      position: relative;
+      animation: scrollUnfold 0.8s ease-in-out;
+    }
+    
+    @keyframes scrollUnfold {
+      0% {
+        transform: scaleY(0.8);
+        opacity: 0;
+      }
+      100% {
+        transform: scaleY(1);
+        opacity: 1;
+      }
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+      .tech-section {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* 全局滚动条隐藏 */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    
+    body {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+  
+  <style>
+    header, section, footer {
+      padding: 80px 120px;
+    }
+    
+    header {
+      padding-top: 60px;
+      padding-bottom: 60px;
+    }
+    
+    h1 {
+      font-size: 3.5rem;
+      line-height: 1.2;
+      margin-bottom: 30px;
+    }
+    
+    h2 {
+      font-size: 2.2rem;
+      margin-bottom: 30px;
+      position: relative;
+      color: var(--indigo);
+    }
+    
+    h2::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -10px;
+      width: 100px;
+      height: 4px;
+      background: var(--gold);
+    }
+    
+    h3 {
+      font-size: 1.5rem;
+      margin: 20px 0 15px;
+      color: var(--red);
+    }
+    
+    p {
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, var(--indigo), #3a6a9f);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, #3a6a9f, var(--indigo));
+    }
+    
+    .nav-btn {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      margin: 15px 0;
+      border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid var(--indigo);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      color: var(--indigo);
+    }
+    
+    .nav-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .nav-btn.active {
+      background: var(--indigo);
+      color: var(--gold);
+    }
+    
+    .tag {
+      display: inline-block;
+      padding: 6px 15px;
+      border-radius: 25px;
+      background-color: var(--gold);
+      color: #000;
+      font-size: 0.9rem;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .tag:hover {
+      background-color: var(--indigo);
+      color: white;
+    }
+    
+    .tag.active {
+      background-color: var(--indigo);
+      color: white;
+    }
+    
+    .quote {
+      font-family: 'ZCOOL XiaoWei', serif;
+      font-style: italic;
+      padding: 20px;
+      border-left: 4px solid var(--gold);
+      background-color: rgba(212, 175, 55, 0.1);
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 悬浮导航 -->
+    <div class="floating-nav">
+      <a href="#history" class="nav-btn" title="历史沿革">
+        <span class="iconify" data-icon="mdi:history" data-width="28"></span>
+      </a>
+      <a href="#techniques" class="nav-btn" title="针法技艺">
+        <span class="iconify" data-icon="mdi:needle" data-width="28"></span>
+      </a>
+      <a href="#gallery" class="nav-btn" title="代表作品">
+        <span class="iconify" data-icon="mdi:image-multiple" data-width="28"></span>
+      </a>
+      <a href="#masters" class="nav-btn" title="传承人">
+        <span class="iconify" data-icon="mdi:account-star" data-width="28"></span>
+      </a>
+    </div>
+    
+    <!-- Banner区 -->
+    <header id="home" class="relative" style="padding-top: 100px; height: 100vh; display: flex; flex-direction: column; justify-content: center;">
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-900/80 to-transparent z-10"></div>
+        <img src="https://modao.cc/ai/uploads/ai_pics/15/156750/aigp_1755738563.jpeg" alt="Xiang embroidery masterpiece showing traditional Chinese patterns" id="1" class="absolute inset-0 w-full h-full object-cover">
+      </div>
+      <div class="relative z-20 text-white max-w-2xl">
+        <h1 class="text-white">湘绣数字化传承平台</h1>
+        <p class="text-xl mb-12">融汇千年技艺，传承湖湘匠心</p>
+        <a href="#history" class="btn">探索湘绣</a>
+      </div>
+    </header>
+    
+    <!-- 湘绣历史区 -->
+    <section id="history" class="card mt-16 mb-16">
+      <h2>湘绣历史沿革</h2>
+      
+      <div class="timeline mt-12">
+        <div class="timeline-node">
+          <div class="timeline-year text-xl font-bold text-indigo-800 mb-3">战国时期</div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <p>湖南刺绣工艺开始萌芽，早期主要服务于宫廷和贵族阶层，是身份和地位的象征。</p>
+          </div>
+        </div>
+        
+        <div class="timeline-node">
+          <div class="timeline-year text-xl font-bold text-indigo-800 mb-3">唐朝</div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <p>湘绣工艺逐渐趋于成熟，融合了各地刺绣风格，形成独特的艺术特色。</p>
+          </div>
+        </div>
+        
+        <div class="timeline-node">
+          <div class="timeline-year text-xl font-bold text-indigo-800 mb-3">清朝中期</div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <p>湘绣进入全盛时期，形成"绣花能生香，绣鸟能听声，绣虎能奔跑，绣人能传神"的美誉。</p>
+          </div>
+        </div>
+        
+        <div class="timeline-node">
+          <div class="timeline-year text-xl font-bold text-indigo-800 mb-3">20世纪</div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <p>胡莲仙开设"吴彩霞绣坊"，使湘绣成为商品进入市场。产品多次在国际博览会上获奖。</p>
+          </div>
+        </div>
+        
+        <div class="timeline-node">
+          <div class="timeline-year text-xl font-bold text-indigo-800 mb-3">1979年</div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <p>湘绣双面全异绣《狮、虎》问世，标志湘绣技艺达到新的高峰。</p>
+          </div>
+        </div>
+        
+        <div class="timeline-node">
+          <div class="timeline-year text-xl font-bold text-indigo-800 mb-3">2006年</div>
+          <div class="bg-white p-6 rounded-lg shadow-sm">
+            <p>湘绣入选第一批国家级非物质文化遗产名录，得到国家层面的保护与传承支持。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 技艺解析区 -->
+    <section id="techniques" class="card mt-16 mb-16">
+      <h2>湘绣技艺解析</h2>
+      
+      <div class="tech-section mt-12">
+        <div class="tech-list">
+          <div class="tech-item mb-8">
+            <h3>齐针</h3>
+            <p>湘绣的基本针法之一，线条整齐匀称，调色鲜明，是表现平整光滑效果的主要针法。</p>
+          </div>
+          
+          <div class="tech-item mb-8">
+            <h3>掺针</h3>
+            <p>采用长针线和短针线相互掺合的方式表现物体形态，极具立体感和真实感。</p>
+          </div>
+          
+          <div class="tech-item mb-8">
+            <h3>平扎针</h3>
+            <p>针脚细密齐整，主要用于绣制山石、树木等景物，形成平整的视觉效果。</p>
+          </div>
+          
+          <div class="tech-item">
+            <h3>乱针绣</h3>
+            <p>看似随意却有序的特殊针法，多用于表现云雾山水，富有水墨般的艺术效果。</p>
+          </div>
+        </div>
+        
+        <div class="tech-demo">
+          <div class="bg-gray-100 rounded-lg overflow-hidden shadow-md">
+            <img src="https://modao.cc/ai/uploads/ai_pics/15/156751/aigp_1755738566.jpeg" alt="Technical demonstration of Xiang embroidery stitches" id="2" class="w-full h-96 object-contain">
+            <div class="p-4 bg-white text-center">
+              <p>掺针技法示范</p>
+            </div>
+          </div>
+          <div class="flex mt-6 justify-center space-x-4">
+            <span class="iconify cursor-pointer text-4xl text-gray-600" data-icon="mdi:rewind" data-width="30"></span>
+            <span class="iconify cursor-pointer text-4xl text-indigo-800" data-icon="mdi:play" data-width="30"></span>
+            <span class="iconify cursor-pointer text-4xl text-gray-600" data-icon="mdi:fast-forward" data-width="30"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 代表作品区 -->
+    <section id="gallery" class="card mt-16 mb-16">
+      <h2>湘绣代表作品</h2>
+      
+      <div class="flex flex-wrap mt-6 mb-10 tag-container">
+        <span class="tag active">全部</span>
+        <span class="tag">人物</span>
+        <span class="tag">花鸟</span>
+        <span class="tag">走兽</span>
+        <span class="tag">山水</span>
+        <span class="tag">文物</span>
+      </div>
+      
+      <div class="gallery">
+        <div class="gallery-item cursor-pointer">
+          <img src="https://modao.cc/ai/uploads/ai_pics/15/156752/aigp_1755738568.jpeg" alt="Xiang embroidery masterpiece 'Mao Zedong Portrait'" id="3" class="w-full h-64 object-cover rounded-lg mb-2 hover:opacity-90 transition">
+          <h3 class="font-semibold">毛泽东肖像</h3>
+          <p class="text-gray-600">现代人物</p>
+        </div>
+        
+        <div class="gallery-item cursor-pointer">
+          <img src="https://modao.cc/ai/uploads/ai_pics/15/156753/aigp_1755738571.jpeg" alt="Hibiscus and Magpie embroidery work" id="4" class="w-full h-64 object-cover rounded-lg mb-2 hover:opacity-90 transition">
+          <h3 class="font-semibold">芙蓉锦鸡</h3>
+          <p class="text-gray-600">花鸟类</p>
+        </div>
+        
+        <div class="gallery-item cursor-pointer">
+          <img src="https://modao.cc/ai/uploads/ai_pics/15/156754/aigp_1755738573.jpeg" alt="Lion embroidery of Xiang embroidery" id="5" class="w-full h-64 object-cover rounded-lg mb-2 hover:opacity-90 transition">
+          <h3 class="font-semibold">雄狮</h3>
+          <p class="text-gray-600">走兽类</p>
+        </div>
+        
+        <div class="gallery-item cursor-pointer">
+          <img src="https://modao.cc/ai/uploads/ai_pics/15/156756/aigp_1755738576.jpeg" alt="Double-sided embroidery Landscape" id="6" class="w-full h-64 object-cover rounded-lg mb-2 hover:opacity-90 transition">
+          <h3 class="font-semibold">张家界风光</h3>
+          <p class="text-gray-600">山水类</p>
+        </div>
+        
+        <div class="gallery-item cursor-pointer">
+          <img src="https://modao.cc/ai/uploads/ai_pics/15/156757/aigp_1755738579.jpeg" alt="Ancient bronze ware embroidery" id="7" class="w-full h-64 object-cover rounded-lg mb-2 hover:opacity-90 transition">
+          <h3 class="font-semibold">青铜四羊方尊</h3>
+          <p class="text-gray-600">文物类</p>
+        </div>
+        
+        <div class="gallery-item cursor-pointer">
+          <img src="https://modao.cc/ai/uploads/ai_pics/15/156758/aigp_1755738581.jpeg" alt="Tiger embroidery with fine details" id="8" class="w-full h-64 object-cover rounded-lg mb-2 hover:opacity-90 transition">
+          <h3 class="font-semibold">下山虎</h3>
+          <p class="text-gray-600">走兽类</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 传承人故事区 -->
+    <section id="masters" class="card mt-16 mb-16">
+      <h2>传承人故事</h2>
+      
+      <div class="master-list mt-12 space-y-16">
+        <div class="master-item flex flex-col md:flex-row gap-10">
+          <div class="md:w-1/3">
+            <img src="https://modao.cc/ai/uploads/ai_pics/15/156759/aigp_1755738584.jpeg" alt="Portrait of Xiang embroidery master Li Yu" id="9" class="w-full h-auto rounded-lg shadow-md">
+          </div>
+          <div class="md:w-2/3">
+            <h3>李瑜</h3>
+            <p>国家级非物质文化遗产湘绣代表性传承人。李瑜老师从事湘绣近50年，精通100余种针法，特别擅长双面全异绣创作。40年默默坚守湘绣传承，培养了近百名湘绣继承人。</p>
+            <div class="quote">
+              "绣品如人品，每一针都要用心。我们的责任不仅是学手艺，更是将文化的魂传承下去。"
+            </div>
+            <p>代表作品《岳阳楼记》耗时4年完成，结构复杂、针法多样，被中国工艺美术馆永久收藏。</p>
+          </div>
+        </div>
+        
+        <div class="master-item flex flex-col md:flex-row gap-10">
+          <div class="md:w-1/3">
+            <img src="https://modao.cc/ai/uploads/ai_pics/15/156760/aigp_1755738586.jpeg" alt="Portrait of Xiang embroidery master Zhang Wen" id="10" class="w-full h-auto rounded-lg shadow-md">
+          </div>
+          <div class="md:w-2/3">
+            <h3>张文</h3>
+            <p>湖南省工艺美术大师，专注于湘绣创新设计。她探索湘绣与现代艺术的融合方式，使传统技艺呈现出国际化表达方式。</p>
+            <div class="quote">
+              "我们要让湘绣不只是作为文物存在，而是成为现代生活中美的载体。创新和传承都是保护的重要方式。"
+            </div>
+            <p>作品《数字山水》系列获中国工艺美术金奖，巧妙结合了科技元素与传统技法。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 页尾互动区 -->
+    <section id="contact" class="mt-16 mb-16">
+      <div class="card">
+        <h2>传承守护留言墙</h2>
+        
+        <div class="mt-8">
+          <p>您的每一句话，都如针尖般汇聚成守护传统的力量</p>
+          <form class="mt-6 space-y-6">
+            <div>
+              <textarea rows="4" placeholder="分享您对湘绣文化的感受或保护建议..." class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"></textarea>
+            </div>
+            <div class="flex flex-wrap gap-4">
+              <input type="text" placeholder="您的称呼（选填）" class="flex-1 p-4 border border-gray-300 rounded-lg">
+              <button type="submit" class="btn bg-indigo-800 text-white">提交留言</button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="mt-12">
+          <h3 class="text-center mb-8">守护湖湘文化，传承刺绣匠心</h3>
+          <div class="flex justify-center items-center gap-6 text-sm text-gray-700">
+            <a href="#" class="hover:text-indigo-700">湘绣数字化保护项目</a>
+            <span>•</span>
+            <a href="#" class="hover:text-indigo-700">传承人口述史</a>
+            <span>•</span>
+            <a href="#" class="hover:text-indigo-700">针法数字图谱</a>
+            <span>•</span>
+            <a href="#" class="hover:text-indigo-700">青少年体验基地</a>
+          </div>
+        </div>
+      </div>
+      
+      <footer class="text-center py-8 text-gray-600 mt-5">
+        <p>© 2025 湘绣数字化传承平台 | 联合保护单位：湖南省非物质文化遗产保护中心</p>
+      </footer>
+    </section>
+    
+    <!-- 作品模态框 -->
+    <div id="artModal" class="modal">
+      <div class="modal-content">
+        <span class="absolute top-4 right-4 cursor-pointer text-3xl" id="closeModal">×</span>
+        <div class="flex flex-col md:flex-row gap-8">
+          <div class="md:w-2/3">
+            <img src="https://modao.cc/ai/uploads/ai_pics/15/156761/aigp_1755738589.jpeg" alt="Detailed display of selected embroidery work" id="11" class="w-full h-auto max-h-[500px] object-contain">
+          </div>
+          <div class="md:w-1/3">
+            <h3 class="border-b pb-3 mb-4">作品详情</h3>
+            <p class="mb-4"><strong>作品名称：</strong>芙蓉锦鸡</p>
+            <p class="mb-4"><strong>创作者：</strong>李瑜大师工作室</p>
+            <p class="mb-4"><strong>创作年代：</strong>2019年</p>
+            <p class="mb-4"><strong>使用针法：</strong>掺针、齐针、编针</p>
+            <p><strong>作品描述：</strong>取材自宋代院体画风格，融入湖湘地方特色。刺绣中的芙蓉花瓣使用了多达七次颜色渐变，锦鸡羽翼采用三层掺针法突出立体质感。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 时间轴滚动效果
+    window.addEventListener('scroll', () => {
+      const timelineNodes = document.querySelectorAll('.timeline-node');
+      const scrollPosition = window.scrollY;
+      const timelineOffset = document.querySelector('.timeline').offsetTop;
+      
+      timelineNodes.forEach(node => {
+        const nodeTop = node.offsetTop + timelineOffset;
+        if (scrollPosition + window.innerHeight - 100 > nodeTop) {
+          setTimeout(() => {
+            node.classList.add('animate-fadeIn');
+          }, 200);
+        }
+      });
+    });
+    
+    // 悬浮导航
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const targetId = this.getAttribute('href').substring(1);
+        document.getElementById(targetId).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+    
+    // 作品画廊模态框
+    document.querySelectorAll('.gallery-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.getElementById('artModal').style.display = 'flex';
+      });
+    });
+    
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.getElementById('artModal').style.display = 'none';
+    });
+    
+    // 标签切换
+    document.querySelectorAll('.tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        if(tag.classList.contains('active')) return;
+        document.querySelector('.tag.active').classList.remove('active');
+        tag.classList.add('active');
+      });
+    });
+  </script>
+
+</body></html>
